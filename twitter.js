@@ -1,17 +1,25 @@
+'use strict';
+
+require('dotenv').config();
+
 const Twitter = require('twitter');
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/stanton');
+const mongoose = require('mongoose');
+const config = require('./config.json');
+
+mongoose.connect(process.env.MONGO_URI, config.mongodb.options);
+
+//mongoose.connect(config.mongodb.local);
+// console.log(process.env)
 
 var Tweet = require('./models/tweet');
 
 const client = new Twitter({
-  consumer_key: '4KacijLt6lalsDfrtOM1fm2jY',
-  consumer_secret: 'LFH8Usa6pVcTLCpZWIvrX8KaFTjLWWdQk9PQxRc2pGW14sDqJe',
-  access_token_key: '115021885-9D8lcervDM1nkNQIjMf8ORB77z2zGS7aRhnggMQH',
-  access_token_secret: 'isu1FBDY8t7fFd7XLelUIfQcuI0Kir6myHg70v8mGY9EZ'
+  consumer_key: process.env.TWITTER_CONSUMER_KEY,
+  consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+  access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
- 
 // Connection URL 
 const stream = client.stream('statuses/filter', {track: 'javascript'});
 

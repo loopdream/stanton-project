@@ -1,0 +1,20 @@
+{
+	"server": { "port": 3000, "host": "localhost" }, 
+	"mongodb": {
+		"local" : "mongodb://127.0.0.1:27017/stanton",
+		"options": {  
+		   "server":{  
+		      "socketOptions":{  
+		         "keepAlive":300000,
+		         "connectTimeoutMS":30000
+		      }
+		   },
+		   "replset":{  
+		      "socketOptions":{  
+		         "keepAlive":300000,
+		         "connectTimeoutMS":30000
+		      }
+		   }
+		}
+	}
+}

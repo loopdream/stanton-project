@@ -1,48 +1,21 @@
 'use strict';
 
+require('dotenv').config();
+
 const Hapi = require('hapi');
-const Twitter = require('twitter');
-const jsonfile = require('jsonfile')
-const file = 'data.json'
+const mongoose = require('mongoose');
+const config = require('./config.json');
+const Tweet = require('./models/tweet');
 
 
-const client = new Twitter({
-  consumer_key: '4KacijLt6lalsDfrtOM1fm2jY',
-  consumer_secret: 'LFH8Usa6pVcTLCpZWIvrX8KaFTjLWWdQk9PQxRc2pGW14sDqJe',
-  access_token_key: '115021885-9D8lcervDM1nkNQIjMf8ORB77z2zGS7aRhnggMQH',
-  access_token_secret: 'isu1FBDY8t7fFd7XLelUIfQcuI0Kir6myHg70v8mGY9EZ'
-});
+mongoose.connect(process.env.MONGO_URI, config.mongodb.options);
+const conn = mongoose.connection;              
+// catch db errors
+conn.on('error', console.error.bind(console, 'connection error:'));  
 
-
-
-/* TWITTER STREAM */
-
-const stream = client.stream('statuses/filter', {track: 'javascript'});
-
-stream.on('data', function(event) {
-  
-    var data = {
-        tweetId: event.id,
-        userId: event.user.id,
-        userName: event.user.screen_name,
-        userLocation: event.user.location,
-        tweet: event.text,
-        created: event.created_at,
-        processed: false
-    }
-
-
-});
-
-stream.on('error', function(error) {
-  throw error;
-});
-
-
-/* SERVER */
 
 const server = new Hapi.Server();
-server.connection({ port: 3000, host: 'localhost' });
+server.connection(config.server);
 
 
 server.route({
@@ -53,27 +26,41 @@ server.route({
     }
 });
 
+
 server.route({
     method: 'GET',
     path: '/{name}',
     handler: function (request, reply) {
-        
-        //reply('Hello, ' + encodeURIComponent(request.params.name) + '!');
+        reply('Hello, ' + encodeURIComponent(request.params.name) + '!');
     }
 });
+
 
 server.route( {
     method: 'GET',
     path: '/tweets',
     handler: function (request, reply) {
+        Tweet.find({ processed: false }, function (err, tweets) {
+          if (err) return console.error(err);
+          // console.log(tweets);
+          var html = '<ul>';
+          for (var i = tweets.length - 1; i >= 0; i--) {
+             html += '<li>' + tweets[i].tweet + '<br>' + tweets[i].created + '</li>';
+          };
+          html += '</ul>';
 
+          reply('Tweets, <br>' + html + '!');
+        });
 
     }
 });
+ 
 
-// server.start((err) => {
-//     if (err) {
-//         throw err;
-//     }
-//     console.log(`Server running at: ${server.info.uri}`);
-// });
+conn.once('open', function() { // Wait for the database connection to establish, then start the app.
+  server.start((err) => {
+      if (err) {
+          throw err;
+      }
+      console.log(`Server running at: ${server.info.uri}`);
+  });                 
+});
