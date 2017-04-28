@@ -12,7 +12,7 @@ exports.register = function (server, options, next) {
         path: '/tweets',
         handler: function (request, reply) {
 
-            db.books.find((err, docs) => {
+            db.tweets.find((err, docs) => {
 
                 if (err) {
                     return reply(Boom.wrap(err, 'Internal MongoDB error'));
@@ -29,7 +29,7 @@ exports.register = function (server, options, next) {
         path: '/tweets/{id}',
         handler: function (request, reply) {
 
-            db.books.findOne({
+            db.tweets.findOne({
                 _id: request.params.id
             }, (err, doc) => {
 

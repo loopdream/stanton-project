@@ -1,20 +1,15 @@
 'use strict';
 
 require('dotenv').config();
-const config = require('./config/config.json');
+const config = require('./config/config');
 const Twitter = require('twitter');
 const mongoose = require('mongoose');
 const Tweet = require('./models/tweet');
-const client = new Twitter({
-  consumer_key: process.env.TWITTER_CONSUMER_KEY,
-  consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-  access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
-  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
-});
+const client = new Twitter(config.twitterAPI);
 
 mongoose.connect(
-  process.env.MONGO_URI, 
-  config.mongodb.options
+  config.database.prodUrl, 
+  config.database.options
 );
 
 const stream = client.stream('statuses/filter', {track: 'javascript'});

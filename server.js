@@ -4,11 +4,17 @@ require('dotenv').config();
 
 const Hapi = require('hapi');
 const mongoose = require('mongoose');
-const config = require('./config/config.json');
+const config = require('./config/config');
 const Tweet = require('./models/tweet');
 
-
-mongoose.connect(process.env.MONGO_URI, config.mongodb.options);
+/*
+http://mph-web.de/build-a-restful-api-using-hapi-js-and-mongodb/
+https://www.cronj.com/blog/hapi-mongoose/
+ */
+mongoose.connect(
+  config.database.prodUrl, 
+  config.database.options
+);
 const conn = mongoose.connection;              
 conn.on('error', console.error.bind(console, 'connection error:'));  
 
@@ -39,6 +45,7 @@ server.route( {
     method: 'GET',
     path: '/tweets',
     handler: function (request, reply) {
+
         Tweet.find({ processed: false }, function (err, tweets) {
           if (err) return console.error(err);
           // console.log(tweets);
