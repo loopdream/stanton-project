@@ -4,13 +4,12 @@ require('dotenv').config();
 
 const Hapi = require('hapi');
 const mongoose = require('mongoose');
-const config = require('./config.json');
+const config = require('./config/config.json');
 const Tweet = require('./models/tweet');
 
 
 mongoose.connect(process.env.MONGO_URI, config.mongodb.options);
 const conn = mongoose.connection;              
-// catch db errors
 conn.on('error', console.error.bind(console, 'connection error:'));  
 
 
@@ -64,3 +63,4 @@ conn.once('open', function() { // Wait for the database connection to establish,
       console.log(`Server running at: ${server.info.uri}`);
   });                 
 });
+

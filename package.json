@@ -11,14 +11,13 @@
   "devDependencies": {},
   "description": "",
   "dependencies": {
+    "boom": "^4.3.1",
     "dotenv": "^4.0.0",
     "hapi": "^16.1.0",
     "hapi-mongodb": "^6.2.1",
-    "jsonfile": "^3.0.0",
+    "joi": "^10.4.1",
     "mongodb": "^2.2.24",
     "mongoose": "^4.8.7",
-    "sequelize": "^3.30.4",
-    "sqlite3": "^3.1.8",
     "twitter-stream-api": "^0.5.0"
   }
 }
