@@ -17,7 +17,9 @@ var tweetSchema = new Schema({
 
 // the schema is useless so far
 // we need to create a model using it
-var Tweet = mongoose.model('Tweet', tweetSchema);
+var tweet = mongoose.model('Tweet', tweetSchema);
 
 // make this available to our users in our Node applications
-module.exports = Tweet;
+module.exports = {
+  Tweet : tweet
+};
