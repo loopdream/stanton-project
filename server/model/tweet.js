@@ -12,6 +12,7 @@ var tweetSchema = new Schema({
 	userLocation: String,
 	tweet: String,
 	created: String,
+	date: Date,
 	processed: Boolean
 });
 

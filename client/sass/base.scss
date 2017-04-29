@@ -1,0 +1,58 @@
+html,
+body {
+  font-family: $font-primary;
+  tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga" 0;
+  font-variant-ligatures: none;
+  position: relative;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+h1 {
+  font-weight: 100;
+  font-size: 1.5rem;
+  line-height: 1.33;
+  margin: 0;
+}
+
+h2 {
+  font-weight: bold;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+.small {
+  line-height: 1.4;
+}
+
+.wrapper {
+  background: white;
+}
+
+.help-qa {
+  @include media-breakpoint-up(xs) {
+    content: 'This only exists to create a new breakpoint in a testing extension. Carry on. Nothing to see here.';
+  }
+}
+
+.cookieBarInner {
+  background: #000;
+  text-align: center;
+
+  .cookieBarButtons {
+    display: block;
+    margin-top: 1em;
+  }
+}
+
+.material-icons {
+  font-variant-ligatures: normal;
+}

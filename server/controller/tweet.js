@@ -27,3 +27,26 @@ exports.getOne = {
     });
   }
 };
+
+exports.getLatest = {
+  handler: function (request, reply) {
+    Tweet.find({}, function (err, tweet) {
+      if (!err) {
+        return reply(tweet);
+      }
+      return reply(Boom.badImplementation(err)); // 500 error
+    }).sort('-date');
+  }
+};
+
+
+exports.getLatestLimit = {
+  handler: function (request, reply) {
+    Tweet.find({}, function (err, tweet) {
+      if (!err) {
+        return reply(tweet);
+      }
+      return reply(Boom.badImplementation(err)); // 500 error
+    }).sort('-date').limit(parseInt(request.params.limit));
+  }
+};
