@@ -5,69 +5,47 @@ require('dotenv').config();
 const Hapi = require('hapi');
 const mongoose = require('mongoose');
 const config = require('./config/config');
-const Tweet = require('./models/tweet');
-
+const Inert = require('inert');
 /*
 http://mph-web.de/build-a-restful-api-using-hapi-js-and-mongodb/
 https://www.cronj.com/blog/hapi-mongoose/
- */
+*/
+
+const server = new Hapi.Server();
+server.connection(config.server);
+const io = require('socket.io')(server.listener);
+
+//Connect to db
 mongoose.connect(
   config.database.prodUrl, 
   config.database.options
 );
-const conn = mongoose.connection;              
-conn.on('error', console.error.bind(console, 'connection error:'));  
-
-
-const server = new Hapi.Server();
-server.connection(config.server);
-
-
-server.route({
-    method: 'GET',
-    path: '/',
-    handler: function (request, reply) {
-        reply('Hello, world!');
-    }
-});
-
-
-server.route({
-    method: 'GET',
-    path: '/{name}',
-    handler: function (request, reply) {
-        reply('Hello, ' + encodeURIComponent(request.params.name) + '!');
-    }
-});
-
-
-server.route( {
-    method: 'GET',
-    path: '/tweets',
-    handler: function (request, reply) {
-
-        Tweet.find({ processed: false }, function (err, tweets) {
-          if (err) return console.error(err);
-          // console.log(tweets);
-          var html = '<ul>';
-          for (var i = tweets.length - 1; i >= 0; i--) {
-             html += '<li>' + tweets[i].tweet + '<br>' + tweets[i].created + '</li>';
-          };
-          html += '</ul>';
-
-          reply('Tweets, <br>' + html + '!');
-        });
-
-    }
-});
  
 
-conn.once('open', function() { // Wait for the database connection to establish, then start the app.
-  server.start((err) => {
-      if (err) {
-          throw err;
-      }
-      console.log(`Server running at: ${server.info.uri}`);
-  });                 
+
+io.on('connection', function (socket) {
+    socket.emit('Oh hii!');
+    socket.on('burp', function () {
+        socket.emit('Excuse you!');
+    });
 });
 
+
+
+// Load plugins and start server
+server.register([ 
+  Inert,  
+  require('./routes/tweets'),
+  require('./routes/static')
+], (err) => {
+
+  if (err) {
+    throw err;
+  }
+
+  // Start the server
+  server.start((err) => {
+    console.log('Server running at:', server.info.uri);
+  });
+
+});
