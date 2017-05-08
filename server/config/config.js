@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const Config = {
+    trackHashtag: process.env.TRACK_HASHTAG,
     server: {
         host: 'localhost',
         port: 3000

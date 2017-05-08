@@ -6,6 +6,9 @@ const browserify   = require('browserify');
 const del          = require('del');
 const lazypipe     = require('lazypipe');
 const argv         = require('yargs').argv;
+const buffer       = require('vinyl-buffer');
+const babelify     = require('babelify');
+const source       = require('vinyl-source-stream');
 
 
 var config = {
@@ -24,10 +27,10 @@ var config = {
 };
 
 // Clean site directory
-gulp.task('clean', del.bind(null, ['src/styles/'], {dot: true}));
+gulp.task('clean', del.bind(null, ['client/styles/'], {dot: true}));
 
 var cssFinish = lazypipe()
-  .pipe(gulp.dest, 'src/styles')
+  .pipe(gulp.dest, 'client/styles')
   .pipe(function () {
     return $.if(config.minify, $.cleanCss());
   })
@@ -35,11 +38,11 @@ var cssFinish = lazypipe()
     return $.if(config.minify, $.rename({suffix: '.min'}));
   })
   .pipe(function () {
-    return $.if(config.minify, gulp.dest('src/styles'));
+    return $.if(config.minify, gulp.dest('client/styles'));
   })
 
 gulp.task('sass', function () {
-  return gulp.src(['src/sass/main.scss'])
+  return gulp.src(['client/sass/main.scss'])
     .pipe($.plumber({errorHandler: $.notify.onError('Error: <%= error.message %>')}))
     .pipe($.sass())
     .pipe($.autoprefixer({browsers: config.supportedBrowsers}))
@@ -47,11 +50,42 @@ gulp.task('sass', function () {
     .pipe(cssFinish());
 });
 
+
+var scriptsFinish = lazypipe()
+  .pipe(gulp.dest, 'client/scripts')
+  .pipe(buffer)
+  .pipe(function () {
+    return $.if(config.minify, $.uglify());
+  })
+  .pipe(function () {
+    return $.if(config.minify, $.rename({suffix: '.min'}));
+  })
+  .pipe(function () {
+    return $.if(config.minify, gulp.dest('client/scripts'));
+  });
+  // .pipe(function () {
+  //   return $.if(browserSync.active, browserSync.stream());
+  // });
+
+// Lint and build scripts
+gulp.task('scripts', function() {
+  return browserify('client/scripts/index.js')
+    .transform(babelify.configure({
+        presets: ['es2015']
+    })).bundle()
+    .pipe(source('app.js'))
+    .pipe($.plumber({errorHandler: $.notify.onError('Error: <%= error.message %>')}))
+    // .pipe($.if(config.isWatching, $.jshint()))
+    // .pipe($.if(config.isWatching, $.jshint.reporter('jshint-stylish')))
+    // .pipe($.if(!browserSync.active, $.jshint.reporter('fail')))
+    .pipe(scriptsFinish());
+});
+
 // Build production files, the default task
 gulp.task('default', ['clean'], function (cb) {
   runSequence(
     'sass',
-    // 'scripts',
+    'scripts',
     // 'images',
     // 'svg'
     cb);

@@ -30,23 +30,42 @@ exports.getOne = {
 
 exports.getLatest = {
   handler: function (request, reply) {
-    Tweet.find({}, function (err, tweet) {
-      if (!err) {
-        return reply(tweet);
-      }
-      return reply(Boom.badImplementation(err)); // 500 error
-    }).sort('-date');
+  	Tweet.
+  		find({ processed: false }).
+  		sort('-created').
+  		exec(function (err, tweet) {
+	      if (!err) {
+	        return reply(tweet);
+	      }
+	      return reply(Boom.badImplementation(err));  
+	  	});
   }
-};
 
+};
+ 
+ 
 
 exports.getLatestLimit = {
   handler: function (request, reply) {
-    Tweet.find({}, function (err, tweet) {
-      if (!err) {
-        return reply(tweet);
-      }
-      return reply(Boom.badImplementation(err)); // 500 error
-    }).sort('-date').limit(parseInt(request.params.limit));
+  	Tweet.
+  		find({ processed: false }).
+  		sort('-created').
+  		limit(parseInt(request.params.limit)).
+  		exec(function (err, tweet) {
+	      if (!err) {
+          
+          Tweet.update({ _id: tweet._id }, { $set: { processed: true }}, function (err, utweet) {
+            if(err) {
+              console.log('Error updating! ' + utweet.userName, tweet);
+            } else {
+              console.log('updating! ' + utweet.userName, tweet);
+            }
+          });
+        
+	        return reply(tweet);
+	      }
+	      return reply(Boom.badImplementation(err));  
+	  	});
   }
 };
+ 

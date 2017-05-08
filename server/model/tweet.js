@@ -9,11 +9,15 @@ var tweetSchema = new Schema({
 	tweetId: Number,
 	userId: Number,
 	userName: String,
+	userHandle: String,
 	userLocation: String,
 	tweet: String,
 	created: String,
-	date: Date,
-	processed: Boolean
+	date: String,
+	processed: {
+        type: Boolean,
+        default: false
+    }
 });
 
 // the schema is useless so far

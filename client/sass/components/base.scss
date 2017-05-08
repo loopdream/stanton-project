@@ -1,0 +1,47 @@
+
+html,
+body {
+  font-family: $font-primary;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga" 0;
+  font-variant-ligatures: none;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  background: $color-bg;
+}
+
+.container {
+  padding: 10% 10% 0 10% ;
+}
+
+header, footer {
+  width: 100%;
+  position: relative;
+  text-align: center; 
+  color: white; 
+}
+
+header {
+  margin-bottom: 90px;
+}
+
+footer {
+  margin-top: 60px;
+  .fa-twitter {
+    font-size: 60px;
+  }
+}
+
+
+.ss-logo {
+  width: 100px;
+  height: 100px;  
+  display: inline-block;
+  // border-radius: 50%;
+  // background-color: white;
+}
+
+
+

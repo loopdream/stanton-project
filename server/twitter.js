@@ -1,31 +1,34 @@
 'use strict';
 
 require('dotenv').config();
-const config = require('./config/config');
-const Twitter = require('twitter');
-const mongoose = require('mongoose');
-const Tweet = require('./model/tweet').Tweet;
-const client = new Twitter(config.twitterAPI);
 
-mongoose.connect(
-  config.database.prodUrl, 
-  config.database.options
+const Config = require('./config/config');
+const Twitter = require('twitter');
+const Mongoose = require('mongoose');
+const Tweet = require('./model/tweet').Tweet;
+const Client = new Twitter(Config.twitterAPI);
+const DateFormat = require('dateformat');
+
+Mongoose.connect(
+  Config.database.prodUrl, 
+  Config.database.options
 );
 
-const stream = client.stream('statuses/filter', {track: 'javascript'});
+const stream = Client.stream('statuses/filter', { track: Config.trackHashtag });
 
 stream.on('data', function(event) {
-    
-    var currentDate = new Date();
+
+    //var date = DateFormat(new Date(), "mmmm dS yyyy H:MM TT");
 
     var data = {
         tweetId: event.id,
         userId: event.user.id,
-        userName: event.user.screen_name,
+        userName: event.user.name,
+        userHandle: event.user.screen_name,
         userLocation: event.user.location,
         tweet: event.text,
         created: event.created_at,
-        date: currentDate,
+        date: new Date(),
         processed: false
     }
 
