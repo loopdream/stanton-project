@@ -31,7 +31,7 @@ exports.getOne = {
 exports.getLatest = {
   handler: function (request, reply) {
   	Tweet.
-  		find({ processed: false }).
+  		find({ processed: true }).
   		sort('-created').
   		exec(function (err, tweet) {
 	      if (!err) {
@@ -47,25 +47,42 @@ exports.getLatest = {
 
 exports.getLatestLimit = {
   handler: function (request, reply) {
+    // get latest unprocessed tweet
   	Tweet.
   		find({ processed: false }).
   		sort('-created').
   		limit(parseInt(request.params.limit)).
   		exec(function (err, tweet) {
 	      if (!err) {
-          
-          Tweet.update({ _id: tweet._id }, { $set: { processed: true }}, function (err, utweet) {
-            if(err) {
-              console.log('Error updating! ' + utweet.userName, tweet);
-            } else {
-              console.log('updating! ' + utweet.userName, tweet);
-            }
-          });
+  
+          // if a tweet is returned, update and mark as processed
+          if (tweet.length) {
+            // console.log(tweet[0].tweetId, tweet);
+            Tweet.update({ tweetId: tweet[0].tweetId }, { $set: { processed: true }}, function (err, utweet) {
+              if(err) {
+                console.log('Error updating! ' + tweet[0].tweetId, tweet);
+              } else {
+                console.log('updating! ' + tweet[0].tweetId, tweet);
+              }
+            });
+          };
+
+          // console.log(tweet);
         
 	        return reply(tweet);
+
 	      }
 	      return reply(Boom.badImplementation(err));  
 	  	});
   }
 };
+
+
+ 
+
+
+
+
+
+
  

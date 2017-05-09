@@ -51,10 +51,14 @@ body {
   position: relative;
   margin: 0;
   padding: 0;
-  background: #000000; }
+  background: #000000;
+  text-align: center; }
 
 .container {
   padding: 10% 10% 0 10%; }
+
+main {
+  width: 100%; }
 
 header, footer {
   width: 100%;
@@ -81,7 +85,8 @@ blockquote.twitter-tweet {
   font-size: 25px;
   line-height: 34px;
   color: white;
-  text-align: center; }
+  text-align: center;
+  width: 100%; }
 
 blockquote.twitter-tweet p {
   font-size: 40px;

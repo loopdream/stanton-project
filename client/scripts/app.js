@@ -21,25 +21,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 require('es6-promise').polyfill();
 
-var TweetUpdate = function () {
-  function TweetUpdate($el) {
-    _classCallCheck(this, TweetUpdate);
+var PollTweet = function () {
+  function PollTweet($el) {
+    _classCallCheck(this, PollTweet);
 
     this.config = {
       tweetTemplate: "<blockquote class='twitter-tweet' data-lang='en' id='<%= tweetId %>''><p lang='en' dir='ltr' class='twitter-tweet__tweet'><%= tweet %></p><i class='fa fa-twitter' aria-hidden='true'></i> — <span class='twitter-tweet__userHandle'>@<%= userHandle %></span> • <span class='twitter-tweet__userName'><%= userName %></span><span class='twitter-tweet__date'><%= date %></span></blockquote>",
-      timer: 20000,
+      interval: 1000,
       latestTweetUrl: window.location.origin + "/tweet/latest/1",
-      updateTweetUrl: window.location.origin + "/tweet/latest/1",
       dateFormat: "mmmm dS yyyy H:MM TT"
     };
 
-    this.currentTweet = this.nextTweet = null;
-    this.getTweet(this.config.latestTweetUrl);
+    this.poll(this.config.latestTweetUrl);
   }
 
-  _createClass(TweetUpdate, [{
-    key: 'getTweet',
-    value: function getTweet(url) {
+  _createClass(PollTweet, [{
+    key: 'poll',
+    value: function poll(url) {
 
       var _this = this;
 
@@ -48,16 +46,28 @@ var TweetUpdate = function () {
         type: 'get',
         contentType: 'application/json; charset=utf-8'
       }).then(function fulfillHandler(data) {
-        console.log(data[0]);
-        var oTweet = data[0];
-        oTweet.date = (0, _dateformat2.default)(oTweet.date, _this.config.dateFormat);
-        var template = _this.compileTemplate(data[0]);
-        (0, _jquery2.default)('main').html(template);
+        _this.pollSuccess(data);
       }, function rejectHandler(jqXHR, textStatus, errorThrown) {
         console.log("something went very bad");
       }).catch(function errorHandler(error) {
         console.log("Exception: ", error);
       });
+    }
+  }, {
+    key: 'pollSuccess',
+    value: function pollSuccess(data) {
+
+      var _this = this;
+
+      if (data.length) {
+        data[0].date = (0, _dateformat2.default)(data[0].date, _this.config.dateFormat);
+        var template = _this.compileTemplate(data[0]);
+        (0, _jquery2.default)('main').html(template);
+      }
+
+      setTimeout(function () {
+        _this.poll(_this.config.latestTweetUrl);
+      }, _this.config.interval);
     }
   }, {
     key: 'compileTemplate',
@@ -74,11 +84,11 @@ var TweetUpdate = function () {
     }
   }]);
 
-  return TweetUpdate;
+  return PollTweet;
 }();
 
 (0, _jquery2.default)(function () {
-  new TweetUpdate();
+  new PollTweet();
 });
 
 },{"dateformat":2,"es6-promise":3,"jquery":4,"lodash":5}],2:[function(require,module,exports){

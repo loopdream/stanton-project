@@ -10,10 +10,15 @@ body {
   margin: 0;
   padding: 0;
   background: $color-bg;
+  text-align: center;
 }
 
 .container {
   padding: 10% 10% 0 10% ;
+}
+
+main {
+  width: 100%;
 }
 
 header, footer {

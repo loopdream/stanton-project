@@ -4,28 +4,25 @@ import $ from 'jquery';
 import _ from 'lodash';
 
 
-class TweetUpdate {
-
+class PollTweet {
 
   constructor($el) {
 
   		this.config = {
   			tweetTemplate: "<blockquote class='twitter-tweet' data-lang='en' id='<%= tweetId %>''><p lang='en' dir='ltr' class='twitter-tweet__tweet'><%= tweet %></p><i class='fa fa-twitter' aria-hidden='true'></i> — <span class='twitter-tweet__userHandle'>@<%= userHandle %></span> • <span class='twitter-tweet__userName'><%= userName %></span><span class='twitter-tweet__date'><%= date %></span></blockquote>",
-  			timer: 20000,
+  			interval: 1000,
   			latestTweetUrl: window.location.origin + "/tweet/latest/1",
-  			updateTweetUrl: window.location.origin + "/tweet/latest/1",
   			dateFormat: "mmmm dS yyyy H:MM TT"
   		}
 
-  		this.currentTweet = this.nextTweet = null;
-  		this.getTweet(this.config.latestTweetUrl);
+      this.poll(this.config.latestTweetUrl);
 
   }
 
 
-  getTweet(url) {
+  poll(url) {
   	
-  	const _this = this;
+  	let _this = this;
 
   	this.ajax({
   	  url: url,
@@ -33,11 +30,7 @@ class TweetUpdate {
   	  contentType: 'application/json; charset=utf-8'
   	}).then(
   	  function fulfillHandler(data) {
-  	    console.log(data[0]);
-  	   	let oTweet = data[0];
-  	    oTweet.date = DateFormat(oTweet.date, _this.config.dateFormat);
-  	    let template = _this.compileTemplate(data[0]);
-  	    $('main').html(template);
+        _this.pollSuccess(data);
   	  },
   	  function rejectHandler(jqXHR, textStatus, errorThrown) {
   	    console.log("something went very bad");
@@ -49,13 +42,28 @@ class TweetUpdate {
   }
 
 
+  pollSuccess(data) {
+
+    let _this = this;
+    
+    if (data.length) {
+      data[0].date = DateFormat(data[0].date, _this.config.dateFormat);
+      let template = _this.compileTemplate(data[0]);
+      $('main').html(template);
+    }
+
+    setTimeout(() => {
+      _this.poll(_this.config.latestTweetUrl) 
+    }, _this.config.interval);
+
+  }
+
 
 
  	compileTemplate(data) {
  		let compiled = _.template(this.config.tweetTemplate);
  		return compiled(data);
  	}
-
 
 
   ajax(options) {
@@ -69,9 +77,6 @@ class TweetUpdate {
 
 
 
-
-
-
 $(function(){
-	new TweetUpdate();
+	new PollTweet();
 });
