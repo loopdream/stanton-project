@@ -1,0 +1,49 @@
+blockquote.twitter-tweet {
+  display: inline-block;
+  font-size: 25px;
+  line-height: 34px;
+  color: white; 
+  text-align: center;
+  width: 100%;
+
+  opacity: 0;
+  transform: translateY(80px);
+  transition: opacity .5s, transform .5s ;
+
+  &.is-active {
+    opacity: 1;
+    transform: translateY(0);
+  } 
+
+  &.fade-out {
+    opacity: 0;
+  } 
+
+
+}
+
+blockquote.twitter-tweet p {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 50px;
+  margin-bottom: 40px;
+}
+
+
+.twitter-tweet__userHandle {
+  font-weight: 700;
+}
+
+
+.twitter-tweet__userName {
+  font-weight: 400;
+} 
+
+.twitter-tweet__date {
+  font-weight: 300;
+  display: block;
+  font-size: 20px;
+  font-style: italic;
+}
+
+

@@ -7,17 +7,23 @@ var Schema = mongoose.Schema;
 // create a schema
 var tweetSchema = new Schema({
 	tweetId: Number,
-	userId: Number,
 	userName: String,
+	userHandle: String,
 	userLocation: String,
 	tweet: String,
 	created: String,
-	processed: Boolean
+	date: String,
+	processed: {
+        type: Boolean,
+        default: false
+    }
 });
 
 // the schema is useless so far
 // we need to create a model using it
-var Tweet = mongoose.model('Tweet', tweetSchema);
+var tweet = mongoose.model('Tweet', tweetSchema);
 
 // make this available to our users in our Node applications
-module.exports = Tweet;
+module.exports = {
+  Tweet : tweet
+};
