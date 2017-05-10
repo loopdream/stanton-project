@@ -27,9 +27,17 @@ var PollTweet = function () {
 
     this.config = {
       tweetTemplate: "<blockquote class='twitter-tweet' data-lang='en' id='<%= tweetId %>''><p lang='en' dir='ltr' class='twitter-tweet__tweet'><%= tweet %></p><i class='fa fa-twitter' aria-hidden='true'></i> — <span class='twitter-tweet__userHandle'>@<%= userHandle %></span> • <span class='twitter-tweet__userName'><%= userName %></span><span class='twitter-tweet__date'><%= date %></span></blockquote>",
-      interval: 1000,
+      interval: 10000,
+      fadeTime: 600,
       latestTweetUrl: window.location.origin + "/tweet/latest/1",
-      dateFormat: "mmmm dS yyyy H:MM TT"
+      dateFormat: "mmmm dS yyyy H:MM TT",
+      selectors: {
+        tweet: '.twitter-tweet'
+      },
+      classNames: {
+        active: 'is-active',
+        fadeOut: 'fade-out'
+      }
     };
 
     this.poll(this.config.latestTweetUrl);
@@ -39,14 +47,22 @@ var PollTweet = function () {
     key: 'poll',
     value: function poll(url) {
 
+      console.log('Polling...');
+
       var _this = this;
+      var cfg = _this.config;
 
       this.ajax({
         url: url,
         type: 'get',
         contentType: 'application/json; charset=utf-8'
       }).then(function fulfillHandler(data) {
+
         _this.pollSuccess(data);
+
+        setTimeout(function () {
+          _this.poll(cfg.latestTweetUrl);
+        }, cfg.interval);
       }, function rejectHandler(jqXHR, textStatus, errorThrown) {
         console.log("something went very bad");
       }).catch(function errorHandler(error) {
@@ -58,16 +74,41 @@ var PollTweet = function () {
     value: function pollSuccess(data) {
 
       var _this = this;
+      var cfg = _this.config;
+      var $main = (0, _jquery2.default)('main');
 
       if (data.length) {
+
+        console.log('Tweet received...');
+
         data[0].date = (0, _dateformat2.default)(data[0].date, _this.config.dateFormat);
         var template = _this.compileTemplate(data[0]);
-        (0, _jquery2.default)('main').html(template);
-      }
+        var $currentTweet = (0, _jquery2.default)(cfg.selectors.tweet + '.' + cfg.classNames.active);
 
-      setTimeout(function () {
-        _this.poll(_this.config.latestTweetUrl);
-      }, _this.config.interval);
+        if ($currentTweet.length) {
+
+          $currentTweet.addClass(cfg.classNames.fadeOut);
+
+          setTimeout(function () {
+
+            $currentTweet.remove();
+            $main.append(template);
+
+            setTimeout(function () {
+              $main.find('#' + data[0].tweetId).addClass(cfg.classNames.active);
+            }, 100);
+          }, cfg.fadeTime);
+        } else {
+
+          $main.append(template);
+
+          setTimeout(function () {
+            $main.find('#' + data[0].tweetId).addClass(cfg.classNames.active);
+          }, cfg.fadeTime);
+        }
+      } else {
+        console.log('No tweet received...');
+      }
     }
   }, {
     key: 'compileTemplate',

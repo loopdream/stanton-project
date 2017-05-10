@@ -18,26 +18,33 @@ const stream = Client.stream('statuses/filter', { track: Config.trackHashtag });
 
 stream.on('data', function(event) {
 
-    //var date = DateFormat(new Date(), "mmmm dS yyyy H:MM TT");
+    // console.log(event);
 
-    var data = {
-        tweetId: event.id,
-        userId: event.user.id,
-        userName: event.user.name,
-        userHandle: event.user.screen_name,
-        userLocation: event.user.location,
-        tweet: event.text,
-        created: event.created_at,
-        date: new Date(),
-        processed: false
-    }
+    if (event && event.user && event !== undefined  ) {
 
-    var t = new Tweet(data);
-    
-    t.save(function(err) {
-      if (err) throw err;
-      console.log('Tweet saved successfully!');
-    });
+      var data = {
+          tweetId: event.id,
+          userName: event.user !== undefined ? event.user.name : 'Anon',
+          userHandle: event.user.screen_name !== undefined ? event.user.screen_name : 'Anon',
+          userLocation: event.user.location !== undefined ? event.user.location : 'Someplace',
+          tweet: event.text,
+          created: event.created_at,
+          date: new Date(),
+          processed: false
+      }
+
+      var t = new Tweet(data);
+      
+      t.save(function(err) {
+        if (err) {
+          throw err;
+        }
+        console.log('Tweet saved successfully!');
+      });
+
+
+    };
+
 
 });
 

@@ -7,7 +7,6 @@ var Schema = mongoose.Schema;
 // create a schema
 var tweetSchema = new Schema({
 	tweetId: Number,
-	userId: Number,
 	userName: String,
 	userHandle: String,
 	userLocation: String,

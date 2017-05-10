@@ -67,8 +67,6 @@ exports.getLatestLimit = {
             });
           };
 
-          // console.log(tweet);
-        
 	        return reply(tweet);
 
 	      }

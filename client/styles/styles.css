@@ -81,12 +81,23 @@ footer {
 
 blockquote.twitter-tweet {
   display: inline-block;
-  font-family: "Helvetica Neue", Roboto, "Segoe UI", Calibri, sans-serif;
   font-size: 25px;
   line-height: 34px;
   color: white;
   text-align: center;
-  width: 100%; }
+  width: 100%;
+  opacity: 0;
+  -webkit-transform: translateY(80px);
+          transform: translateY(80px);
+  transition: opacity .5s, -webkit-transform .5s;
+  transition: opacity .5s, transform .5s;
+  transition: opacity .5s, transform .5s, -webkit-transform .5s; }
+  blockquote.twitter-tweet.is-active {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0); }
+  blockquote.twitter-tweet.fade-out {
+    opacity: 0; }
 
 blockquote.twitter-tweet p {
   font-size: 40px;

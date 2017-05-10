@@ -10,9 +10,17 @@ class PollTweet {
 
   		this.config = {
   			tweetTemplate: "<blockquote class='twitter-tweet' data-lang='en' id='<%= tweetId %>''><p lang='en' dir='ltr' class='twitter-tweet__tweet'><%= tweet %></p><i class='fa fa-twitter' aria-hidden='true'></i> — <span class='twitter-tweet__userHandle'>@<%= userHandle %></span> • <span class='twitter-tweet__userName'><%= userName %></span><span class='twitter-tweet__date'><%= date %></span></blockquote>",
-  			interval: 1000,
+  			interval: 10000,
+        fadeTime: 600,
   			latestTweetUrl: window.location.origin + "/tweet/latest/1",
-  			dateFormat: "mmmm dS yyyy H:MM TT"
+  			dateFormat: "mmmm dS yyyy H:MM TT",
+        selectors: {
+          tweet: '.twitter-tweet'
+        },
+        classNames: {
+          active: 'is-active',
+          fadeOut: 'fade-out'
+        }
   		}
 
       this.poll(this.config.latestTweetUrl);
@@ -22,7 +30,10 @@ class PollTweet {
 
   poll(url) {
   	
+    console.log('Polling...');
+
   	let _this = this;
+    let cfg = _this.config;
 
   	this.ajax({
   	  url: url,
@@ -30,7 +41,13 @@ class PollTweet {
   	  contentType: 'application/json; charset=utf-8'
   	}).then(
   	  function fulfillHandler(data) {
+
         _this.pollSuccess(data);
+
+        setTimeout(() => {
+          _this.poll(cfg.latestTweetUrl) 
+        }, cfg.interval);
+
   	  },
   	  function rejectHandler(jqXHR, textStatus, errorThrown) {
   	    console.log("something went very bad");
@@ -42,20 +59,52 @@ class PollTweet {
   }
 
 
+
+
   pollSuccess(data) {
 
-    let _this = this;
     
+
+    let _this = this;
+    let cfg = _this.config;
+    let $main = $('main');
+
     if (data.length) {
+
+      console.log('Tweet received...');
+
       data[0].date = DateFormat(data[0].date, _this.config.dateFormat);
       let template = _this.compileTemplate(data[0]);
-      $('main').html(template);
+      let $currentTweet = $(cfg.selectors.tweet + '.' + cfg.classNames.active);
+   
+      if ($currentTweet.length) {
+
+        $currentTweet.addClass(cfg.classNames.fadeOut);
+
+        setTimeout(()=> {
+
+          $currentTweet.remove();
+          $main.append(template);
+
+          setTimeout(()=> {
+            $main.find('#' + data[0].tweetId).addClass(cfg.classNames.active);
+          }, 100 );
+
+        }, cfg.fadeTime);
+
+      } else {
+
+        $main.append(template);
+      
+        setTimeout(()=> {
+          $main.find('#' + data[0].tweetId).addClass(cfg.classNames.active);
+        }, cfg.fadeTime);
+
+      }
+      
+    } else {
+      console.log('No tweet received...');
     }
-
-    setTimeout(() => {
-      _this.poll(_this.config.latestTweetUrl) 
-    }, _this.config.interval);
-
   }
 
 
@@ -68,7 +117,7 @@ class PollTweet {
 
   ajax(options) {
     return new Promise(function (resolve, reject) {
-        $.ajax(options).done(resolve).fail(reject);
+      $.ajax(options).done(resolve).fail(reject);
     });
   }
 
