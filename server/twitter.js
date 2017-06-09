@@ -8,6 +8,7 @@ const Mongoose = require('mongoose');
 const Tweet = require('./model/tweet').Tweet;
 const Client = new Twitter(Config.twitterAPI);
 const DateFormat = require('dateformat');
+const _ = require('lodash');
 
 Mongoose.connect(
   Config.database.prodUrl, 
@@ -16,11 +17,16 @@ Mongoose.connect(
 
 const stream = Client.stream('statuses/filter', { track: Config.trackHashtag });
 
+/* Twitter stream returns more than just tweets - Check the object reposnse. */
+const isTweet = _.conforms({
+  user: _.isObject,
+  id_str: _.isString,
+  text: _.isString,
+});
+
 stream.on('data', function(event) {
-
-    // console.log(event);
-
-    if (event && event.user && event !== undefined  ) {
+    
+    if (isTweet(event)) {
 
       var data = {
           tweetId: event.id,
@@ -34,21 +40,21 @@ stream.on('data', function(event) {
       }
 
       var t = new Tweet(data);
-      
       t.save(function(err) {
+        console.log('Tweet saved successfully!', data);
         if (err) {
           throw err;
         }
-        console.log('Tweet saved successfully!');
       });
-
-
+    } else {
+      console.log('Invalid Tweet!', event);
     };
 
 
 });
 
 stream.on('error', function(error) {
+  // console.log('Stream error!', event);
   throw error;
 });
 

@@ -1,5 +1,5 @@
 var Tweet = require('./controller/tweet'),
-  Static = require('./static');
+  Static = require('./controller/static');
 
 // API Server Endpoints
 exports.endpoints = [

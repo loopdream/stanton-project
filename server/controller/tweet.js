@@ -28,6 +28,7 @@ exports.getOne = {
   }
 };
 
+
 exports.getLatest = {
   handler: function (request, reply) {
   	Tweet.
@@ -40,11 +41,9 @@ exports.getLatest = {
 	      return reply(Boom.badImplementation(err));  
 	  	});
   }
-
 };
  
  
-
 exports.getLatestLimit = {
   handler: function (request, reply) {
     // get latest unprocessed tweet
@@ -60,9 +59,9 @@ exports.getLatestLimit = {
             // console.log(tweet[0].tweetId, tweet);
             Tweet.update({ tweetId: tweet[0].tweetId }, { $set: { processed: true }}, function (err, utweet) {
               if(err) {
-                console.log('Error updating! ' + tweet[0].tweetId, tweet);
+                //console.log('Error updating! ' + tweet[0].tweetId, tweet);
               } else {
-                console.log('updating! ' + tweet[0].tweetId, tweet);
+                //console.log('updating! ' + tweet[0].tweetId, tweet);
               }
             });
           };
